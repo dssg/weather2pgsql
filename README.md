@@ -8,7 +8,7 @@ Input requirements:
 3. WBAN weather-station code
 4. Set Postgres [environment variables](https://www.postgresql.org/docs/9.5/static/libpq-envars.html)
 
-You can find the weather-station codes [here](ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.txt).
+You can find the weather-station codes [here](http://bit.ly/2kpCFcU).
 
 To download weather data for Chicago's Midway Airport,
 ```
