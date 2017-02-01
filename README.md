@@ -1,5 +1,12 @@
 # NOAA_weather
-Download hourly NOAA data for a weather station, transform it, and load it into a Postgres database
+This code downloads, modifies, and loads two NOAA weather datasets into a Postgres database:
+
+1. A dataset of all the weather stations the NOAA [Integrated Surface Database](https://www.ncdc.noaa.gov/isd) (ISD) tracks 
+2. ISD's complete history of hour-by-hour readings for one user-specified weather station
+
+The script creates a Postgres schema called `weather`, a table for weather-station data called `weather.weather_stations`,
+and a table for weather data called `weather.weather`. The script modifies some of the data to meet standard conventions. For example,
+ISD reports temperatures in Celsius times 10; the script divides that column by 10 and adds `_celsius` to the column name.
 
 Input requirements:
 
