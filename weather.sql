@@ -1,8 +1,6 @@
 create schema if not exists weather;
 
-drop table if exists weather.weather;
-
-create table weather.weather (
+create table if not exists weather.weather (
     usaf INTEGER NOT NULL,
     wban INTEGER NOT NULL,
     year INTEGER NOT NULL, 
@@ -18,4 +16,3 @@ create table weather.weather (
     liquid_precipitation_mm_one_hour INTEGER, 
     liquid_precipitation_mm_six_hours INTEGER
 );
-
