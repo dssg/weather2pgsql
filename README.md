@@ -1,4 +1,4 @@
-# NOAA_weather
+# weather2postgres
 This code downloads, modifies, and loads two NOAA weather datasets into a Postgres database:
 
 1. A dataset of all the weather stations the NOAA [Integrated Surface Database](https://www.ncdc.noaa.gov/isd) (ISD) has tracked
@@ -21,6 +21,8 @@ To download weather data for Chicago's Midway Airport,
 ```
 ./weather_download.sh /mnt/data/jwalsh/weather/ 725340 14819
 ```
+
+You can run the script multiple times for different airports. All the weather data get loaded into the `weather.weather` table. You can use the lat/long information in the `weather.weather_stations` table to identify the nearest weather station to any given point.
 
 Software requirements:
 * bash
