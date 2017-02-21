@@ -19,7 +19,7 @@ You can find the weather-station codes [here](http://bit.ly/2kpCFcU).
 
 To download weather data for Chicago's Midway Airport,
 ```
-./weather_download.sh /mnt/data/jwalsh/weather/ 725340 14819
+./weather.sh /mnt/data/jwalsh/weather/ 725340 14819
 ```
 
 You can run the script multiple times for different airports. All the weather data get loaded into the `weather.weather` table. You can use the lat/long information in the `weather.weather_stations` table to identify the nearest weather station to any given point.
