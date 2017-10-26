@@ -1,46 +1,38 @@
-#!/usr/bin/env bash
+#!/bin/bash
+set -ev
 
-# Downloads hourly weather data for a given station
-# Find the codes and available dates at ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.csv
+# Downloads hourly weather data for a given state
 
 # Inputs:
 #
 #  1) Directory name
-#  2) US Air Force weather-station code
-#  3) WBAN weather-station code
-#  4) Set Postgres environment variables or .pgpass
+#  2) Two-letter state abbreviation
+#  3) Set Postgres environment variables or .pgpass
 
 # Output:
 
 
-
-# Check for their existence
-if [ $# -lt 3 ]
-then
-  echo "Three arguments required"
-  exit 1
-fi
-
-#  1. Directory Name where you'll store the data
-DIRNAME=$1
-#  2. USAF code
-USAF=$2
-#  3. WBAN code 
-WBAN=$3
- 
+# load credentials
+source default_profile
 
 
-##  WEATHER-STATION DATA  ##
+#  WEATHER-STATION DATA  ##
 ############################
 
 # download weather-station data
-(cd $DIRNAME && wget -N 'ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.csv')
+mkdir -p data
+wget -N -P 'data/' 'ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.csv'
 
-# create schema and table for weather-station data
+
+# create schema and tables for weather data
 psql -v ON_ERROR_STOP=1 -f weather_stations.sql 
+psql -v ON_ERROR_STOP=1 -f weather.sql
+
 
 # copy data into weather-station data
-cat ${DIRNAME}/isd-history.csv | tr [:upper:] [:lower:] | tr ' ' '_' | sed 's/""//g' |
+tr [:upper:] [:lower:] < data/isd-history.csv |
+tr ' ' '_' | 
+sed 's/""//g' |
 csvsql --query "select usaf, wban, station_name, ctry as country, state, icao, lat, lon, \"elev(m)\" as elevation_meters, \
     date(substr(begin,1,4) || '-' || substr(begin,5,2) || '-' || substr(begin,7,2)) as begin_date, \
     date(substr(end,1,4) || '-' || substr(end,5,2) || '-' || substr(end,7,2)) as end_date from stdin;" |
@@ -48,26 +40,22 @@ psql -v ON_ERROR_STOP=1 -c "\copy weather.weather_stations from stdin with csv h
 
 
 # grab beginning and ending years for the given station
-begin=$(cat ${DIRNAME}/isd-history.csv | grep -E "${USAF}.*${WBAN}" | cut -d, -f10 | cut -c2-5)
-end=$(cat ${DIRNAME}/isd-history.csv | grep -E "${USAF}.*${WBAN}" | cut -d, -f11 | cut -c2-5)
+N_STATIONS=$(psql -tc "select count(*) as freq from weather.weather_stations where state = '$STATE_ABBREV';")
+for i in $(seq 1 "$N_STATIONS");
+do
+  STATION=$(psql -c "\copy (select usaf, wban, extract(year from begin_date), extract(year from end_date) \
+                            from weather.weather_stations \
+                            where state = '$STATE_ABBREV' \
+                            limit 1 \
+                            offset $i-1) \
+                     to stdout with csv;")
+  USAF=$(echo "$STATION" | cut -d',' -f1)
+  WBAN=$(echo "$STATION" | cut -d',' -f2)
+  BEGIN=$(echo "$STATION" | cut -d',' -f3)
+  END=$(echo "$STATION" | cut -d',' -f4)
 
+  echo "$USAF" "$WBAN" "$BEGIN" "$END"  
 
-
-##      WEATHER DATA      ##
-############################
-
-# download the zipped files
-parallel -j200% '(wget -N -P {1} "ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-lite/{4}/{2}-{3}-{4}.gz")' ::: $DIRNAME ::: $USAF ::: $WBAN ::: $(seq $begin $end)
-
-
-# create schema and table for weather data
-psql -v ON_ERROR_STOP=1 -f weather.sql 
-
-# unzip
-gunzip -c ${DIRNAME}/*.gz | sed 's/-9999/     /g' | in2csv -H -s weather_schema.csv | sed 's/,-,/,,/g' |
-csvsql --query "select ${USAF} as usaf, ${WBAN} as wban, year, month, day, hour, air_temp/10.0 as air_temp_celsius, \
-    dew_point_temp/10.0 as dew_point_temp_celsius, sea_level_pressure, wind_direction, .36*wind_speed_rate as wind_speed_km_hr, \
-    sky_condition_total_coverage_code, liquid_precipitation_depth_dimension_one_hour as liquid_precipitation_mm_one_hour, \
-    liquid_precipitation_depth_dimension_six_hours as liquid_precipitation_mm_six_hours from stdin;" |
-psql -v ON_ERROR_STOP=1 -c "\copy weather.weather from stdin with csv header;"
-
+  # download the zipped files
+  parallel -j100% 'bash parallel.sh {1} {2} {3}' ::: "$USAF" ::: "$WBAN" ::: $(seq "$BEGIN" "$END")
+done
