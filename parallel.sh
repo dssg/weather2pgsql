@@ -1,7 +1,5 @@
 #!/bin/bash
-set -ev
-
-source default_profile
+set -e
 
 USAF=$1
 WBAN=$2

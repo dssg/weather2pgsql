@@ -1,15 +1,17 @@
 #!/bin/bash
-set -ev
+set -e
 
 # Downloads hourly weather data for a given state
 
-# Inputs:
+# Inputs (defined in default_profile):
 #
-#  1) Directory name
-#  2) Two-letter state abbreviation
-#  3) Set Postgres environment variables or .pgpass
+#  1) Two-letter state abbreviation
+#  2) Set Postgres environment variables or .pgpass
 
 # Output:
+#  1) postgres schema `weather`
+#  2) table for weather stations
+#  3) table for weather
 
 
 # load credentials
@@ -57,5 +59,6 @@ do
   echo "$USAF" "$WBAN" "$BEGIN" "$END"  
 
   # download the zipped files
-  parallel -j100% 'bash parallel.sh {1} {2} {3}' ::: "$USAF" ::: "$WBAN" ::: $(seq "$BEGIN" "$END")
+  parallel -j200% 'bash parallel.sh {1} {2} {3}' ::: "$USAF" ::: "$WBAN" ::: $(seq "$BEGIN" "$END")
+
 done
