@@ -1,8 +1,8 @@
 create schema if not exists weather;
 
 create table if not exists weather.weather (
-    usaf INTEGER NOT NULL,
-    wban INTEGER NOT NULL,
+    usaf VARCHAR(6) NOT NULL,
+    wban VARCHAR(5) NOT NULL,
     year INTEGER NOT NULL, 
     month VARCHAR(2) NOT NULL, 
     day VARCHAR(2) NOT NULL, 
