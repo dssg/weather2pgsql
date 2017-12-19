@@ -39,8 +39,8 @@ psql -v ON_ERROR_STOP=1 \
 tr [:upper:] [:lower:] < data/isd-history.csv |
 tr ' ' '_' | 
 sed 's/""//g' |
-csvsql --query "select substr('000000' || cast(usaf as text) as usaf, \
-                       substr('000000' || cast(wban as text) as wban, \
+csvsql --query "select substr('000000' || cast(usaf as text), -6, 6) as usaf, \
+                       substr('000000' || cast(wban as text), -6, 6) as wban, \
                        station_name, \
                        ctry as country, \
                        state, \
