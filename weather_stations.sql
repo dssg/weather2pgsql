@@ -3,8 +3,8 @@ create schema if not exists weather;
 drop table if exists weather.weather_stations;
 
 CREATE TABLE weather.weather_stations (
-    usaf VARCHAR(6) NOT NULL, 
-    wban VARCHAR(5) NOT NULL, 
+    usaf CHAR(6) NOT NULL, 
+    wban CHAR(5) NOT NULL, 
     station_name VARCHAR(57), 
     ctry VARCHAR(4), 
     state VARCHAR(4), 

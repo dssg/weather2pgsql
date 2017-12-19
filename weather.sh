@@ -23,22 +23,36 @@ source default_profile
 
 # download weather-station data
 mkdir -p data
-wget -N -P 'data/' 'ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.csv'
+wget -N \
+     -P 'data/' \
+     'ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.csv'
 
 
 # create schema and tables for weather data
-psql -v ON_ERROR_STOP=1 -f weather_stations.sql 
-psql -v ON_ERROR_STOP=1 -f weather.sql
+psql -v ON_ERROR_STOP=1 \
+     -f weather_stations.sql 
+psql -v ON_ERROR_STOP=1 \
+     -f weather.sql
 
 
 # copy data into weather-station data
 tr [:upper:] [:lower:] < data/isd-history.csv |
 tr ' ' '_' | 
 sed 's/""//g' |
-csvsql --query "select usaf, wban, station_name, ctry as country, state, icao, lat, lon, \"elev(m)\" as elevation_meters, \
-    date(substr(begin,1,4) || '-' || substr(begin,5,2) || '-' || substr(begin,7,2)) as begin_date, \
-    date(substr(end,1,4) || '-' || substr(end,5,2) || '-' || substr(end,7,2)) as end_date from stdin;" |
-psql -v ON_ERROR_STOP=1 -c "\copy weather.weather_stations from stdin with csv header;"
+csvsql --query "select substr('000000' || cast(usaf as text) as usaf, \
+                       substr('000000' || cast(wban as text) as wban, \
+                       station_name, \
+                       ctry as country, \
+                       state, \
+                       icao, \
+                       lat, \
+                       lon, \
+                       \"elev(m)\" as elevation_meters, \
+                       date(substr(begin,1,4) || '-' || substr(begin,5,2) || '-' || substr(begin,7,2)) as begin_date, \
+                       date(substr(end,1,4) || '-' || substr(end,5,2) || '-' || substr(end,7,2)) as end_date \
+               from stdin;" |
+psql -v ON_ERROR_STOP=1 \
+     -c "\copy weather.weather_stations from stdin with csv header;"
 
 
 # grab beginning and ending years for the given station
