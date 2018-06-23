@@ -51,6 +51,8 @@ psql -v ON_ERROR_STOP=1 <<< $(echo "set role $PGROLE;" | cat - weather_stations.
 ##       WEATHER DATA     ##
 ############################
 
+psql -v ON_ERROR_STOP=1 <<< $(echo "set role $PGROLE;" | cat - weather.sql)
+
 if [[ ! -z "$STATE_ABBREV" ]]; then
   # grab beginning and ending years for the stations
   N_STATIONS=$(psql -t <<-END | sed -E 's/[A-Za-z ]+//g'
