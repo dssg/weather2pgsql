@@ -1,12 +1,12 @@
 # download and store hourly NOAA weather data for a given US state
 
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
-RUN apt-get update && \
-    apt-get install -y wget \
-                       parallel \
-                       postgresql \
-                       python3-pip
+RUN apt update && \
+    apt install -y wget \
+                   parallel \
+                   postgresql \
+                   python3-pip
 
 # install csvkit
 RUN pip3 install --upgrade pip && \

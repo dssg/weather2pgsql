@@ -1,7 +1,9 @@
 export PGHOST=localhost
 export PGDATABASE=postgres
 export PGUSER=postgres
+export PGROLE=write_role
 export PGPASSWORD=password
 export PGPORT=5432
 
 STATE_ABBREV=wa
+#COUNTRY_ABBREV=

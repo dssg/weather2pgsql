@@ -10,7 +10,7 @@ ISD reports temperatures in Celsius times 10; the script divides that column by 
 
 To run: 
 
-1. Copy `default_profile_example` to `default_profile` and modify with your database credentials and preferred state.
+1. Copy `default_profile_example` to `default_profile` and modify with your database credentials (including database role, which is typically your username) preferred location.
 2. Build the docker image: `docker build -t "weather:latest" .`
 
 If you'd like data for multiple states, you can build images for each.

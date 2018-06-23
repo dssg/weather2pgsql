@@ -16,3 +16,4 @@ create table if not exists weather.weather (
     liquid_precipitation_mm_one_hour INTEGER, 
     liquid_precipitation_mm_six_hours INTEGER
 );
+
