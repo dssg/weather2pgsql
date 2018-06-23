@@ -13,7 +13,7 @@ RUN pip3 install --upgrade pip && \
     pip3 install csvkit
 
 # clone repo
-RUN wget -O- https://api.github.com/repos/dssg/weather2pgsql/tarball/0b655a8ca9ce6fa3d1c96758d0c5784d6537cfa4 | \
+RUN wget -O- https://api.github.com/repos/dssg/weather2pgsql/tarball/481219bcea3f317616f4c7a65c02f2dcbdd96ff | \
     tar -zxf -
 
 ENV BASE="/dssg-weather2pgsql-0b655a8"
