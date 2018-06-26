@@ -15,7 +15,7 @@ set -e
 
 
 # load credentials
-source default_profile
+#source default_profile
 
 
 ##  WEATHER-STATION DATA  ##
